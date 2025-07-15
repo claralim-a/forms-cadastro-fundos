@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "cleave.js": "^1.6.0",
     "cpf-cnpj-validator": "^1.0.3",
     "next": "15.3.5",
     "react": "^19.0.0",
