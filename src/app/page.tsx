@@ -3,19 +3,23 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { cnpj } from "cpf-cnpj-validator";
 
+// CONFIGURAÇÕES PROJETO ===========================================================
+
 // Tipagem do formulário
 type FormularioFundo = {
-  cnpj: string;
-  classe: string;
-  estrategia: string;
-  observacoes: string;
-  relatorio1: string;
-  relatorio2: string;
-  relatorio3: string;
-  codFundoMaster: string;
-  cnpjFundoMaster: string;
+  ID_FUNDO: string;
+  ST_CNPJ_FUNDO: string;
+  ST_CLASSE_FUNDO: string;
+  ST_ESTRATEGIA_FUNDO: string;
+  ST_OBS_FUNDO: string;
+  ST_RELATORIO1_FUNDO: string;
+  ST_RELATORIO2_FUNDO: string;
+  ST_RELATORIO3_FUNDO: string;
+  COD_QUANTUM_FUNDOMASTER: string;
+  ST_CNPJ_FUNDOMASTER: string;
 };
 
+// Autenticação
 export default function Home() {
   const [autenticado, setAutenticado] = useState(false);
 
@@ -27,17 +31,19 @@ export default function Home() {
   });
 
   const [form, setForm] = useState<FormularioFundo>({
-    cnpj: "",
-    classe: "",
-    estrategia: "",
-    observacoes: "",
-    relatorio1: "",
-    relatorio2: "",
-    relatorio3: "",
-    codFundoMaster: "",
-    cnpjFundoMaster: "",
+    ID_FUNDO: "",
+    ST_CNPJ_FUNDO: "",
+    ST_CLASSE_FUNDO: "",
+    ST_ESTRATEGIA_FUNDO: "",
+    ST_OBS_FUNDO: "",
+    ST_RELATORIO1_FUNDO: "",
+    ST_RELATORIO2_FUNDO: "",
+    ST_RELATORIO3_FUNDO: "",
+    COD_QUANTUM_FUNDOMASTER: "",
+    ST_CNPJ_FUNDOMASTER: "",
   });
 
+  // Opções classe ANBIMA
   const opcoesClasse = [
     "Renda Fixa",
     "Multimercado",
@@ -48,6 +54,7 @@ export default function Home() {
     "Previdência",
   ];
 
+  // Login 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -70,23 +77,62 @@ export default function Home() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!cnpj.isValid(form.cnpj)) {
-      alert("CNPJ inválido! O formato correto é: XX.XXX.XXX/XXXX-XX.");
-      return;
-    }
+  // CNPJ fundo
+  if (!cnpj.isValid(form.ST_CNPJ_FUNDO)) {
+    alert("CNPJ inválido! O formato correto é: XX.XXX.XXX/XXXX-XX.");
+    return;
+  }
 
-    if (!form.classe || !form.estrategia) {
-      alert("Preencha todos os campos obrigatórios.");
-      return;
-    }
+  // CNPJ fundo master (opcional)
+  if (form.ST_CNPJ_FUNDOMASTER && !cnpj.isValid(form.ST_CNPJ_FUNDOMASTER)) {
+    alert("CNPJ Fundo Master inválido! O formato correto é: XX.XXX.XXX/XXXX-XX.");
+    return;
+  }
 
-    console.log("Dados enviados:", form);
-    // Aqui pode integrar com API futuramente
-  };
+  if (!form.ST_CLASSE_FUNDO || !form.ST_ESTRATEGIA_FUNDO || !form.ST_RELATORIO1_FUNDO) {
+    alert("Preencha todos os campos obrigatórios.");
+    return;
+  }
 
+  try {
+    const response = await fetch("http://localhost:8000/fundos/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${process.env.NEXT_PUBLIC_API_TOKEN}`,  
+      },
+      body: JSON.stringify(form),
+    });
+
+    if (response.ok) {
+      alert("Fundo cadastrado com sucesso!");
+      setForm({
+        ID_FUNDO: "",
+        ST_CNPJ_FUNDO: "",
+        ST_CLASSE_FUNDO: "",
+        ST_ESTRATEGIA_FUNDO: "",
+        ST_OBS_FUNDO: "",
+        ST_RELATORIO1_FUNDO: "",
+        ST_RELATORIO2_FUNDO: "",
+        ST_RELATORIO3_FUNDO: "",
+        COD_QUANTUM_FUNDOMASTER: "",
+        ST_CNPJ_FUNDOMASTER: "",
+      });
+      } else {
+        const erroTexto = await response.text();
+        console.error("Erro ao cadastrar fundo:", erroTexto);
+        alert("Erro ao cadastrar fundo. Verifique os dados ou o servidor.");
+      }
+  } catch (error) {
+    console.error("Erro na requisição:", error);
+    alert("Erro na conexão com o servidor.");
+  }
+};
+
+  // INTERFACE ===============================================================
   return (
     <>
       {/* Logo*/}
@@ -100,13 +146,14 @@ export default function Home() {
         />
       </div>
 
+      {/* Página de Autenticação */}
       {!autenticado ? (
         <main className="max-w-sm mx-auto p-4">
           <h2 className="text-xl font-bold mb-4">Autenticação</h2>
           <form onSubmit={handleLogin} className="space-y-4">
             <input
               type="text"
-              name="usuario"
+              name="superuser"
               placeholder="Usuário"
               value={login.usuario}
               onChange={(e) =>
@@ -149,30 +196,43 @@ export default function Home() {
           <h1 className="text-2xl font-bold mb-4">Cadastro de Fundos</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* CNPJ */}
+            {/* ID_FUNDO */}
             <input
-              name="cnpj"
+              name="ID_FUNDO"
               type="text"
-              placeholder="CNPJ do fundo"
+              placeholder="ID do Fundo"
               className="w-full border p-2"
-              value={form.cnpj}
+              value={form.ID_FUNDO}
               onChange={handleChange}
               required
             />
 
-            {/* Classe ANBIMA */}
+            {/* CNPJ */}
+            <input
+              name="ST_CNPJ_FUNDO"
+              type="text"
+              placeholder="CNPJ do fundo"
+              className="w-full border p-2"
+              value={form.ST_CNPJ_FUNDO}
+              onChange={handleChange}
+              required
+            />
+
+            {/* CLASSE ANBIMA */}
             <select
-              name="classe"
-              className={`w-full border p-2 ${
-                form.classe === "" ? "text-gray-250" : "text-black"
+              name="ST_CLASSE_FUNDO"
+              className={`w-full border p-2 bg-black text-white ${
+                form.ST_CLASSE_FUNDO === "" ? "text-gray-400" : "text-white"
               }`}
-              value={form.classe}
+              value={form.ST_CLASSE_FUNDO}
               onChange={handleChange}
               required
             >
-              <option value="">Selecione a Classe ANBIMA</option>
+              <option value="" className="text-gray-400">
+                Selecione a Classe ANBIMA
+              </option>
               {opcoesClasse.map((item) => (
-                <option key={item} value={item} className="text-black">
+                <option key={item} value={item} className="text-white bg-black">
                   {item}
                 </option>
               ))}
@@ -180,67 +240,69 @@ export default function Home() {
 
             {/* Estrategia */}
             <textarea
-              name="estrategia"
+              name="ST_ESTRATEGIA_FUNDO"
               placeholder="Descrição da estratégia"
               className="w-full border p-2"
-              value={form.estrategia}
+              value={form.ST_ESTRATEGIA_FUNDO}
               onChange={handleChange}
               required
             />
 
             {/* Observacoes */}
             <textarea
-              name="observacoes"
-              placeholder="Observações gerais"
+              name="ST_OBS_FUNDO"
+              placeholder="Observações gerais (Opcional)"
               className="w-full border p-2"
-              value={form.observacoes}
+              value={form.ST_OBS_FUNDO}
               onChange={handleChange}
             />
 
             {/* Relatorios */}
             <textarea
-              name="relatorio1"
-              placeholder="Relatório 1 (Opcional)"
+              name="ST_RELATORIO1_FUNDO"
+              placeholder="Relatório 1"
               className="w-full border p-2"
-              value={form.relatorio1}
+              value={form.ST_RELATORIO1_FUNDO}
               onChange={handleChange}
+              required // único required entre os relatorios
             />
             <textarea
-              name="relatorio2"
+              name="ST_RELATORIO2_FUNDO"
               placeholder="Relatório 2 (Opcional)"
               className="w-full border p-2"
-              value={form.relatorio2}
+              value={form.ST_RELATORIO2_FUNDO}
               onChange={handleChange}
             />
 
             <textarea
-              name="relatorio3"
+              name="ST_RELATORIO3_FUNDO"
               placeholder="Relatório 3 (Opcional)"
               className="w-full border p-2"
-              value={form.relatorio3}
+              value={form.ST_RELATORIO3_FUNDO}
               onChange={handleChange}
             />
 
             {/* Codigo Fundo Master */}
             <input
-              name="codFundoMaster"
+              name="COD_QUANTUM_FUNDOMASTER"
               type="text"
               placeholder="Código fundo master (Opcional)"
               className="w-full border p-2"
-              value={form.codFundoMaster}
+              value={form.COD_QUANTUM_FUNDOMASTER}
               onChange={handleChange}
             />
 
             {/* CNPJ Fundo Master */}
             <input
-              name="cnpjFundoMaster"
+              name="ST_CNPJ_FUNDOMASTER"
               type="text"
               placeholder="CNPJ fundo master (Opcional)"
               className="w-full border p-2"
-              value={form.cnpjFundoMaster}
+              value={form.ST_CNPJ_FUNDOMASTER}
               onChange={handleChange}
             />
 
+            {/* Botão Submit */}
             <button
               type="submit"
               className="bg-blue-600 text-white px-4 py-2 rounded"
