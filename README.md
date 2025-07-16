@@ -8,7 +8,7 @@ Este projeto foi desenvolvido como parte de um desafio técnico para uma vaga de
 ### Acesse as aplicações em produção:
 
 - [Formulário (Next.js via Vercel)](https://forms-cadastro-fundos.vercel.app/)
-- [API (Django via Render)](https://api-fundos-outliers.onrender.com/fundos/)
+- [API (Django via Render)](https://api-fundos-outliers.onrender.com/)
 
 ### Repositórios GitHub:
 
