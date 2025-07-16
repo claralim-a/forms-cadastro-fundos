@@ -51,7 +51,8 @@ export default function FundoForm() {
   // Função de cadastro do fundo
   async function cadastrarFundo(data: FormularioFundo) {
     try {
-      const response = await fetch("http://localhost:8000/fundos/", {
+      //  "http://localhost:8000/fundos/" (para rodar local)
+      const response = await fetch("https://api-fundos-outliers.onrender.com/fundos/", { 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
