@@ -5,6 +5,10 @@ Este projeto foi desenvolvido como parte de um desafio técnico para uma vaga de
 - **Front-end**: Formulário web em React/Next.js com autenticação, validações e envio de dados.
 - **Back-end**: API REST construída com Django REST Framework, responsável por armazenar, validar e expor os dados dos fundos.
 
+### Tutorial em vídeo para cadastro de novos fundos:
+
+- [Link GoogleDrive](https://drive.google.com/drive/u/1/folders/11ahFvqVyn71_IVtkdYjUJRJxdWcIU6A_)
+
 ### Acesse as aplicações em produção:
 
 - [Formulário (Next.js via Vercel)](https://forms-cadastro-fundos.vercel.app/)
